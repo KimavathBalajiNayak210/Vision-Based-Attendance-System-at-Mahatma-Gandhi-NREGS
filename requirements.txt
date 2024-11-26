@@ -7,7 +7,8 @@ pillow
 pandas
 openpyxl
 ```
-
+streamlit
+notion-client==1.0.0
 2. Create a simplified Streamlit application that focuses on core functionality:
 
 
@@ -85,7 +86,3 @@ Deployment Recommendations:
 
 Would you like me to help you further diagnose the requirements installation error? Can you share the specific error message from the terminal?
 
-Key Troubleshooting Questions:
-1. What exact error message did you see?
-2. Are you using Streamlit Cloud?
-3. What Python version is your project targeting?
