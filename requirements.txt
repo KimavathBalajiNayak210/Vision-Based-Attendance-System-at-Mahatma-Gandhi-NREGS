@@ -1,49 +1,130 @@
-# YOLOv5 requirements
-# Usage: pip install -r requirements.txt
+streamlit
+opencv-python-headless
+numpy
+torch
+torchvision
+pillow
+pandas
+openpyxl
+ultralytics
+```
 
-# Base ------------------------------------------------------------------------
-gitpython>=3.1.30
-matplotlib>=3.3
-numpy>=1.23.5
-opencv-python>=4.1.1
-pillow>=10.3.0
-psutil  # system resources
-PyYAML>=5.3.1
-requests>=2.32.2
-scipy>=1.4.1
-thop>=0.1.1  # FLOPs computation
-torch>=1.8.0  # see https://pytorch.org/get-started/locally (recommended)
-torchvision>=0.9.0
-tqdm>=4.66.3
-ultralytics>=8.2.34  # https://ultralytics.com
-# protobuf<=3.20.1  # https://github.com/ultralytics/yolov5/issues/8012
+2. Modify the code to include more robust import handling:
 
-# Logging ---------------------------------------------------------------------
-# tensorboard>=2.4.1
-# clearml>=1.2.0
-# comet
 
-# Plotting --------------------------------------------------------------------
-pandas>=1.1.4
-seaborn>=0.11.0
+import streamlit as st
+import sys
+import subprocess
 
-# Export ----------------------------------------------------------------------
-# coremltools>=6.0  # CoreML export
-# onnx>=1.10.0  # ONNX export
-# onnx-simplifier>=0.4.1  # ONNX simplifier
-# nvidia-pyindex  # TensorRT export
-# nvidia-tensorrt  # TensorRT export
-# scikit-learn<=1.1.2  # CoreML quantization
-# tensorflow>=2.4.0,<=2.13.1  # TF exports (-cpu, -aarch64, -macos)
-# tensorflowjs>=3.9.0  # TF.js export
-# openvino-dev>=2023.0  # OpenVINO export
+# Function to install missing packages
+def install_package(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-# Deploy ----------------------------------------------------------------------
-setuptools>=70.0.0 # Snyk vulnerability fix
-# tritonclient[all]~=2.24.0
+# Try importing with fallback
+try:
+    import cv2
+except ImportError:
+    st.warning("OpenCV not found. Attempting to install...")
+    try:
+        install_package('opencv-python-headless')
+        import cv2
+    except Exception as e:
+        st.error(f"Could not import OpenCV. Please install manually: {e}")
+        cv2 = None
 
-# Extras ----------------------------------------------------------------------
-# ipython  # interactive notebook
-# mss  # screenshots
-# albumentations>=1.0.3
-# pycocotools>=2.0.6  # COCO mAP
+import numpy as np
+from datetime import datetime
+import torch
+from PIL import Image
+import pathlib
+import time
+import pandas as pd
+
+# Ensure compatibility across different path systems
+pathlib.PosixPath = pathlib.WindowsPath
+
+def load_model():
+    try:
+        # Use ultralytics YOLOv5 instead of torch.hub
+        from ultralytics import YOLO
+        
+        # Update these paths with your YOLOv5 weights
+        weights_path = "best.pt"  # Ensure this file is in your repository
+        
+        model = YOLO(weights_path)
+        st.success("YOLOv5 model loaded successfully!")
+        return model
+    except Exception as e:
+        st.error(f"Error loading YOLOv5 model: {str(e)}")
+        return None
+
+def detect_and_annotate(model, frame):
+    if cv2 is None:
+        st.error("OpenCV not available for detection")
+        return frame, {}
+
+    try:
+        # Ultralytics detection method
+        results = model(frame)
+        annotated_frame = frame.copy()
+        detected_workers = {}
+        
+        for idx, result in enumerate(results):
+            boxes = result.boxes
+            for box in boxes:
+                # Get box coordinates
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                conf = float(box.conf[0])
+                cls = int(box.cls[0])
+                name = model.names[cls]
+                
+                if conf > 0.6 and name != 'unknown':
+                    detected_workers[idx] = {
+                        'name': name,
+                        'confidence': conf,
+                    }
+                    
+                    # Draw bounding box and label
+                    cv2.rectangle(annotated_frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(annotated_frame, name, (x1, y1 - 10), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        return annotated_frame, detected_workers
+    except Exception as e:
+        st.error(f"Error in detection: {str(e)}")
+        return frame, {}
+
+def main():
+    st.set_page_config(page_title="Real-Time Attendance System", layout="wide")
+    st.title("Vision-Based Attendance System at Mahatma Gandhi NREGS")
+    
+    # Fallback if OpenCV is not available
+    if cv2 is None:
+        st.error("OpenCV is required for this application. Please install opencv-python-headless.")
+        return
+
+    # Rest of the code remains the same as in the original script...
+    # (You can paste the rest of the main() function here)
+
+if __name__ == "__main__":
+    main()
+```
+
+Key modifications:
+1. Added package installation fallback
+2. Updated model loading to use Ultralytics YOLO
+3. Added error handling for OpenCV import
+4. Simplified detection method
+5. Added safeguards against missing libraries
+
+Deployment Steps:
+1. Create a `requirements.txt` file with the contents from the first artifact
+2. Ensure your model weights file (`best.pt`) is in the repository root
+3. If using Streamlit Cloud, place the weights file in the repository
+
+Additional Recommendations:
+- If you're using a custom-trained model, ensure the weights are compatible with Ultralytics YOLO
+- Verify the model weights are not too large for repository hosting
+- Consider using GitHub Releases or a cloud storage link for large model files
+
+Would you like me to help you further refine the deployment strategy or explain any part of the modifications?
