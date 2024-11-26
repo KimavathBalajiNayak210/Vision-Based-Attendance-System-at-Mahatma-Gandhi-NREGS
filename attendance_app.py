@@ -13,7 +13,7 @@ def load_model():
     try:
         # Update these paths with your YOLOv5 directory and trained weights
         repo_path = "https://github.com/ultralytics/yolov5?tab=readme-ov-file"
-        weights_path = "/Experiments/weight_20/weights/best.pt"
+        weights_path = "weight30/weights/best.pt"
         
         model = torch.hub.load(repo_path, "custom", path=weights_path, source="local", force_reload=True)
         st.success("YOLOv5 model loaded successfully!")
