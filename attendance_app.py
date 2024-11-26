@@ -12,7 +12,7 @@ pathlib.PosixPath = pathlib.WindowsPath
 def load_model():
     try:
         # Update these paths with your YOLOv5 directory and trained weights
-        repo_path = "/Users/balaji/Desktop/miniproject/yolov5"
+        repo_path = "https://github.com/ultralytics/yolov5?tab=readme-ov-file"
         weights_path = "/Experiments/weight_20/weights/best.pt"
         
         model = torch.hub.load(repo_path, "custom", path=weights_path, source="local", force_reload=True)
