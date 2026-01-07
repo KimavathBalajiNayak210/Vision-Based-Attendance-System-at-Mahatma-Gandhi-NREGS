@@ -1,6 +1,6 @@
 streamlit
 pyttsx3
-opencv-python
+opencv-python-headless
 numpy>=1.23.5
 torch
 torchvision
