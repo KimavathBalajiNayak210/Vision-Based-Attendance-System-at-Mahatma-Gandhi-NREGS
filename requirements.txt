@@ -1,139 +1,19 @@
-
 streamlit
-opencv-python-headless
-numpy
-torch
-torchvision
-pillow
-pandas
-openpyxl
-```
-# YOLOv5 requirements
-# Usage: pip install -r requirements.txt
-
-# Base ------------------------------------------------------------------------
+pyttsx3
 gitpython>=3.1.30
 matplotlib>=3.3
 numpy>=1.23.5
 opencv-python>=4.1.1
 pillow>=10.3.0
-psutil  # system resources
+psutil
 PyYAML>=5.3.1
 requests>=2.32.2
 scipy>=1.4.1
-thop>=0.1.1  # FLOPs computation
-torch>=1.8.0  # see https://pytorch.org/get-started/locally (recommended)
+thop>=0.1.1
+torch>=1.8.0
 torchvision>=0.9.0
 tqdm>=4.66.3
-ultralytics>=8.2.34  # https://ultralytics.com
-# protobuf<=3.20.1  # https://github.com/ultralytics/yolov5/issues/8012
-
-# Logging ---------------------------------------------------------------------
-# tensorboard>=2.4.1
-# clearml>=1.2.0
-# comet
-
-# Plotting --------------------------------------------------------------------
+ultralytics>=8.2.34
 pandas>=1.1.4
 seaborn>=0.11.0
-
-# Export ----------------------------------------------------------------------
-# coremltools>=6.0  # CoreML export
-# onnx>=1.10.0  # ONNX export
-# onnx-simplifier>=0.4.1  # ONNX simplifier
-# nvidia-pyindex  # TensorRT export
-# nvidia-tensorrt  # TensorRT export
-# scikit-learn<=1.1.2  # CoreML quantization
-# tensorflow>=2.4.0,<=2.13.1  # TF exports (-cpu, -aarch64, -macos)
-# tensorflowjs>=3.9.0  # TF.js export
-# openvino-dev>=2023.0  # OpenVINO export
-
-# Deploy ----------------------------------------------------------------------
-setuptools>=70.0.0 # Snyk vulnerability fix
-# tritonclient[all]~=2.24.0
-
-# Extras ----------------------------------------------------------------------
-# ipython  # interactive notebook
-# mss  # screenshots
-# albumentations>=1.0.3
-# pycocotools>=2.0.6  # COCO mAP
-
-streamlit
-notion-client==1.0.0
-2. Create a simplified Streamlit application that focuses on core functionality:
-
-
-import streamlit as st
-import cv2
-import numpy as np
-import pandas as pd
-from datetime import datetime
-
-def main():
-    st.set_page_config(page_title="Attendance System", layout="wide")
-    st.title("Vision-Based Attendance System")
-
-    # Basic area and group selection
-    st.sidebar.header("Attendance Details")
-    areas = ["Ponds Construction", "Rocks Works", "Water Conservation"]
-    groups = ["Group A", "Group B", "Group C"]
-    
-    selected_area = st.sidebar.selectbox("Select Area", areas)
-    selected_group = st.sidebar.selectbox("Select Group", groups)
-
-    # File uploader as fallback for webcam
-    uploaded_file = st.file_uploader("Upload Worker Image", type=['jpg', 'jpeg', 'png'])
-    
-    if uploaded_file is not None:
-        # Read the image file
-        file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
-        opencv_image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-        
-        st.image(opencv_image, channels="BGR", use_column_width=True)
-        
-        # Placeholder for detection (you'll replace this with actual detection logic)
-        st.write("Image Processing Placeholder")
-
-    # Attendance recording
-    if st.button("Record Attendance"):
-        record = {
-            "Date": datetime.now().strftime("%Y-%m-%d"),
-            "Time": datetime.now().strftime("%H:%M:%S"),
-            "Area": selected_area,
-            "Group": selected_group
-        }
-        st.success("Attendance recorded!")
-        st.write(record)
-
-if __name__ == "__main__":
-    main()
-```
-
-3. Create a `config.toml` file for Streamlit configuration:
-
-
-[server]
-maxUploadSize = 1028
-
-[deprecation]
-showPyplotGlobalUse = false
-```
-
-Deployment Recommendations:
-1. Ensure these files are in your repository:
-   - `requirements.txt`
-   - `app.py` (the simplified application)
-   - `.streamlit/config.toml`
-
-2. Troubleshooting Steps:
-   - Remove complex dependencies like torch initially
-   - Verify OpenCV installation
-   - Use the simplified app for basic functionality
-
-3. If persistent issues occur:
-   - Check Streamlit Cloud logs
-   - Verify Python version compatibility
-   - Ensure no conflicting package versions
-
-Would you like me to help you further diagnose the requirements installation error? Can you share the specific error message from the terminal?
-
+setuptools>=70.0.0
