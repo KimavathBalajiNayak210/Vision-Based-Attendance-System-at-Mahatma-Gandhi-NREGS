@@ -10,9 +10,7 @@ import pathlib
 import time
 import pandas as pd
 import pyttsx3
-
-# Ensure Windows path compatibility
-pathlib.PosixPath = pathlib.WindowsPath
+from ultralytics import YOLO
 
 # Predefined worker database with unique IDs
 WORKER_DATABASE = {
@@ -33,7 +31,7 @@ def initialize_tts():
         engine.setProperty('volume', 0.9)  # Volume (0.0 to 1.0)
         return engine
     except Exception as e:
-        st.error(f"Text-to-Speech initialization error: {str(e)}")
+        st.warning("Text-to-Speech not available on this platform.")
         return None
 
 # Speak worker name function
@@ -50,10 +48,9 @@ def speak_worker_name(tts_engine, worker_name, unique_id):
 def load_model():
     try:
         # Update these paths with your YOLOv5 directory and trained weights
-        repo_path = "/Users/balaji/Desktop/miniproject/yolov5"
-        weights_path = "/Users/balaji/Desktop/miniproject/yolov5/Experiments/weightLarge36/ml36/weights/best.pt"
+        weights_path = "yolov5/Experiments/weightLarge36/ml36/weights/best.pt"
         
-        model = torch.hub.load(repo_path, "custom", path=weights_path, source="local", force_reload=True)
+        model = YOLO(weights_path)
         st.success("YOLOv5 model loaded successfully!")
         return model
     except Exception as e:
@@ -67,9 +64,10 @@ def detect_and_annotate(model, frame):
         annotated_frame = frame.copy()
         detected_workers = {}
         
-        for idx, (*xyxy, conf, cls) in enumerate(results.xyxy[0]):
-            conf = float(conf)
-            cls = int(cls)
+        for idx, box in enumerate(results[0].boxes):
+            xyxy = box.xyxy[0]
+            conf = float(box.conf[0])
+            cls = int(box.cls[0])
             name = model.names[cls]
             
             if conf > 0.7 and name != 'unknown':  # Higher confidence and exclude unknown
